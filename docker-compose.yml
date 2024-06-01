@@ -37,6 +37,9 @@ services:
     environment:
       - REDIS_DSN=redis://inviter_redis:6379
       - SUPER_ADMIN=941501054
+    depends_on:
+      - inviter_postgres
+      - inviter_redis
     networks:
       - bot
     build: 
