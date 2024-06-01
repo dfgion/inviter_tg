@@ -1,0 +1,45 @@
+services:
+  inviter_postgres:
+    image: postgres:14-alpine
+    container_name: inviter_postgres
+    hostname: inviter_postgres
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - "./docker-data/postgres:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_PASSWORD=jwt123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=inviter_db
+    networks:
+      - bot
+        
+  inviter_redis:
+    image: redis:latest
+    container_name: inviter_redis
+    hostname: inviter_redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - "./docker-data/redis-data:/var/lib/redis"
+      - "./docker-data/redis.conf:/usr/local/etc/redis/redis.conf"
+    networks:
+      - bot
+
+  inviter_bot:
+    container_name: inviter_bot
+    hostname: inviter_bot
+    restart: always
+    ports:
+      - 6498:6498
+    environment:
+      - REDIS_DSN=redis://inviter_redis:6379
+      - SUPER_ADMIN=941501054
+    networks:
+      - bot
+    build: 
+      context: "./bot"
+
+  
