@@ -36,9 +36,12 @@ async def handle_public_join(event: ChatMemberUpdated, bot: Bot):
         by=CacheOption.GET,
         tag='messages'
     )
-    await bot.send_message(
-        chat_id=event.from_user.id,
-        text=messages[0],
-        parse_mode='html',
-        reply_markup=invitation_channels_keyboard()
-    )
+    try:
+        await bot.send_message(
+            chat_id=event.from_user.id,
+            text=messages[0],
+            parse_mode='html',
+            reply_markup=invitation_channels_keyboard()
+        )
+    except:
+        pass
