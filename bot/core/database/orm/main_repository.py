@@ -36,7 +36,7 @@ class SqlAlchemyRepository(AbstractRepository):
     @classmethod
     async def update_object(
         cls,
-        entry_id: int | uuid.UUID,
+        entry_id: int,
         data: dict
     ):
         async with async_session() as session:

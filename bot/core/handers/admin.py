@@ -238,6 +238,9 @@ async def accept_changing_handler(callback_query: CallbackQuery, state: FSMConte
             "text": data.get("change_message")
         }
     )
+    await Cache.invaliding_cache(
+        tag='messages'
+    )
     await callback_query.message.answer("Сообщение было изменено")
     try:
         await callback_query.message.delete()
