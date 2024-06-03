@@ -11,9 +11,8 @@ def on_startup(dispatcher):
     print('Бот Запущен')
     
 def set_middleware_router(router: Router):
-    router.message.outer_middleware.register(NewUserMiddleware())
+    router.message.middleware.register(NewUserMiddleware())
     return router
-
 
 def dp_setting(dp: Dispatcher) -> None:
     dp.include_router(set_middleware_router(users.router))
