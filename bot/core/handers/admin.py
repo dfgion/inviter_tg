@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 
 from ..markups.inline import (
     admin_menu_keyboard, accept_spam_message_keyboard, 
-    menu_keyboard, accept_new_admin_keyboard, 
+    back_to_menu_keyboard, accept_new_admin_keyboard, 
     ask_photo_keyboard, accept_changing_keyboard
 )
 from ..filters.chat import ChatTypeFilter
@@ -97,22 +97,30 @@ async def handle_spam_message(message: Message, state: FSMContext):
 
 @router.message(NewAdminStates.admin_id)
 async def handle_admin_id(message: Message, state: FSMContext):
-    await message.answer(
-        text="Вы уверены, что хотите назначиить данного пользователя администратором?",
-        reply_markup=accept_new_admin_keyboard()
-    )
-    await state.update_data(
-        {
-            "admin_telegram_id": message.text
-        }
-    )
+    try:
+        if (message.text and (len(message.text.strip()) <= 19)):
+            await state.update_data(
+                {
+                    "admin_telegram_id": int(message.text.strip())
+                }
+            )
+            await message.answer(
+                text="Вы уверены, что хотите назначиить данного пользователя администратором?",
+                reply_markup=accept_new_admin_keyboard()
+            )
+        else:
+            raise Exception()
+    except:
+        await message.answer(
+                text="Некорректный ответ, введите корректный telegram id администратора"
+            )
 
 @router.message(ChatTypeFilter(chat_type=['private']), IsAdmin())
 async def start(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text="Здравствуйте, {name}".format(name=message.from_user.full_name),
-        reply_markup=menu_keyboard()
+        reply_markup=back_to_menu_keyboard()
     )
     
     
@@ -156,7 +164,7 @@ async def start(callback_query: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == 'accept_new_admin')
 async def accept_new_admin(callback_query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    admin_id = data.get("admin_id")
+    admin_id = data.get("admin_telegram_id")
     await Cache.invaliding_cache(
         tag="admins"
     )
@@ -196,10 +204,19 @@ async def start_spam(callback_query: CallbackQuery, state: FSMContext):
                     chat_id=telegram_id,
                     text=text
                 )
+        try:
+            await callback_query.message.edit_text(
+                text="Рассылка запущена",
+                reply_markup=back_to_menu_keyboard()
+            )
+        except:
+            pass
     else:
-        await callback_query.message.answer(
-            text="Пока нет пользователей для рассылки"
+        await callback_query.message.edit_text(
+            text="Пока нет пользователей для рассылки",
+            reply_markup=back_to_menu_keyboard()
         )
+    
         
 
 @router.callback_query(F.data == 'change_join_message')

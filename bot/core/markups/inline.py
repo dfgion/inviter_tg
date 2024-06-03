@@ -68,7 +68,7 @@ def accept_new_admin_keyboard():
     return inline_keyboard.as_markup()
 
 
-def menu_keyboard():
+def back_to_menu_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -81,8 +81,8 @@ def ask_photo_keyboard():
     inline_keyboard = InlineKeyboardBuilder()
     
     buttons = [
-        {"text": "Нет, не хочу", "callback_data": "add_photo"},
-        {"text": "Да, хочу добавить", "callback_data": "ask_confirm"}
+        {"text": "Нет, не хочу", "callback_data": "ask_confirm"},
+        {"text": "Да, хочу добавить", "callback_data": "add_photo"}
     ]
     
     

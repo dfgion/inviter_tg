@@ -15,6 +15,7 @@ class NewUserMiddleware(BaseMiddleware):
         event: Union[ChatMemberUpdated, ChatJoinRequest], 
         data: Dict[str, Any]
     ) -> Coroutine[Any, Any, Any]:
+        print("In NewUser")
         await Cache.invaliding_cache(
             tag="users"
         )
@@ -24,6 +25,6 @@ class NewUserMiddleware(BaseMiddleware):
                     "telegram_id": event.from_user.id
                 }
             )
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return await handler(event, data)
