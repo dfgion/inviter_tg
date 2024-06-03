@@ -31,7 +31,7 @@ class SqlAlchemyRepository(AbstractRepository):
             new_object = cls.model(**data)
             session.add(new_object)
             await session.flush()
-            await session.commit()  
+            await session.commit()          
     
     @classmethod
     async def update_object(

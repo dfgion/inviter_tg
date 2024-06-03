@@ -10,7 +10,7 @@ from core.config import Config
 
 async def insert_admins(session: AsyncSession):
     admin = models.admin.AdminOrm(
-        telegram_id=Config.SUPER_ADMIN, 
+        telegram_id=int(Config.SUPER_ADMIN), 
     )
     session.add(admin)
     await session.flush()

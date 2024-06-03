@@ -12,8 +12,6 @@ services:
       - POSTGRES_PASSWORD=jwt123
       - POSTGRES_USER=postgres
       - POSTGRES_DB=inviter_db
-    networks:
-      - bot
         
   inviter_redis:
     image: redis:latest
@@ -25,13 +23,10 @@ services:
     volumes:
       - "./docker-data/redis-data:/var/lib/redis"
       - "./docker-data/redis.conf:/usr/local/etc/redis/redis.conf"
-    networks:
-      - bot
 
   inviter_bot:
     container_name: inviter_bot
     hostname: inviter_bot
-    restart: always
     ports:
       - 6498:6498
     environment:
@@ -40,9 +35,8 @@ services:
     depends_on:
       - inviter_postgres
       - inviter_redis
-    networks:
-      - bot
     build: 
       context: "./bot"
+
 
   
