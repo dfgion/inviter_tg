@@ -18,9 +18,12 @@ class NewUserMiddleware(BaseMiddleware):
         await Cache.invaliding_cache(
             tag="users"
         )
-        await UserRepository.insert_object(
-            data={
-                "telegram_id": event.from_user.id
-            }
-        )
+        try:
+            await UserRepository.insert_object(
+                data={
+                    "telegram_id": event.from_user.id
+                }
+            )
+        except:
+            pass
         return await handler(event, data)

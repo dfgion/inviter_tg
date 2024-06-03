@@ -52,7 +52,7 @@ async def ask_photo_handler(callback_query: CallbackQuery, state: FSMContext):
 @router.message(F.content_type == 'photo', SpamStates.photo)      
 @router.callback_query(F.data == 'ask_confirm')
 async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
-    if not hasattr(invoice, "data"):
+    if hasattr(invoice, "data"):
         message = invoice.message
     else:
         await state.update_data(
