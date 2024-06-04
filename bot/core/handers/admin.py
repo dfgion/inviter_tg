@@ -42,8 +42,8 @@ async def ask_photo_handler(callback_query: CallbackQuery, state: FSMContext):
     except:
         pass
     
-@router.message(F.content_type == 'photo', SpamStates.photo)      
-@router.callback_query(F.data == 'ask_confirm')
+@router.message(F.content_type == 'photo', SpamStates.line)      
+@router.callback_query(F.data == 'ask_confirm', SpamStates.line)
 async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
     if hasattr(invoice, "data"):
         message = invoice.message
@@ -63,8 +63,8 @@ async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
     except:
         pass
     
-@router.message(F.content_type == 'photo', ChangeMessageStates.photo)      
-@router.callback_query(F.data == 'ask_confirm')
+@router.message(F.content_type == 'photo', ChangeMessageStates.line)      
+@router.callback_query(F.data == 'ask_confirm', ChangeMessageStates.line)
 async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
     if hasattr(invoice, "data"):
         message = invoice.message
@@ -95,7 +95,7 @@ async def new_message_handler(message: Message, state: FSMContext):
             "change_message": message.text
         }
     )
-    await state.set_state(ChangeMessageStates.photo)
+    await state.set_state(ChangeMessageStates.line)
 
 @router.message(SpamStates.spam_message)    
 async def handle_spam_message(message: Message, state: FSMContext):
@@ -108,7 +108,7 @@ async def handle_spam_message(message: Message, state: FSMContext):
         text="Хотите добавить фотографию к этому сообщению?",
         reply_markup=ask_photo_keyboard()
     )
-    await state.set_state(SpamStates.photo)
+    await state.set_state(SpamStates.line)
 
 @router.message(NewAdminStates.admin_id)
 async def handle_admin_id(message: Message, state: FSMContext):
