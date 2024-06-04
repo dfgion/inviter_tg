@@ -10,6 +10,10 @@ class MessageOrm(Model):
     
     entry_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
     text: Mapped[str] = mapped_column(nullable=False, unique=False)
+    photo_id: Mapped[str] = mapped_column(nullable=True, unique=False)
     
     def serialize(self):
-        return self.text
+        return {
+            "text": self.text, 
+            "photo_id": self.photo_id
+        }

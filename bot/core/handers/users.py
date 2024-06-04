@@ -21,13 +21,22 @@ async def approve_user(chat_join: ChatJoinRequest, bot: Bot):
         by=CacheOption.GET,
         tag='messages'
     )
-    await bot.send_message(
-        chat_id=chat_join.from_user.id,
-        text=messages[0],
-        parse_mode='html',
-        reply_markup=invitation_channels_keyboard()
-    )
-    
+    try:
+        if photo_id := messages[0]["photo_id"]:
+            await bot.send_photo(
+                chat_id=chat_join.from_user.id,
+                photo=photo_id,
+                caption=messages[0]['text'],
+                parse_mode='html'
+            )
+        else: 
+            await bot.send_message(
+                chat_id=chat_join.from_user.id,
+                text=messages[0]['text'],
+                parse_mode='html'
+            )
+    except:
+        pass
 
 @router.chat_member(ChatMemberUpdatedFilter(JOIN_TRANSITION))
 async def handle_public_join(event: ChatMemberUpdated, bot: Bot):
@@ -40,8 +49,7 @@ async def handle_public_join(event: ChatMemberUpdated, bot: Bot):
         await bot.send_message(
             chat_id=event.from_user.id,
             text=messages[0],
-            parse_mode='html',
-            reply_markup=invitation_channels_keyboard()
+            parse_mode='html'
         )
     except:
         pass

@@ -32,18 +32,11 @@ from ..config import bot
 router = Router()
 
 
-@router.callback_query(SpamStates.ask_photo, F.data == 'add_photo')    
+@router.callback_query(F.data == 'add_photo')    
 async def ask_photo_handler(callback_query: CallbackQuery, state: FSMContext):
-    if callback_query.data == 'add_photo':
-        await callback_query.message.answer(
-            text="Пришлите фотографию для рассылки"
-        )
-        await state.set_state(SpamStates.photo)
-    else:
-        await callback_query.message.answer(
-            text="Вы уверены, что хотите отправить это сообщение?",
-            reply_markup=accept_spam_message_keyboard()
-        )
+    await callback_query.message.answer(
+        text="Пришлите фотографию для рассылки"
+    )
     try:
         await callback_query.message.delete()
     except:
@@ -70,17 +63,39 @@ async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
     except:
         pass
     
-@router.message(ChangeMessageStates.message) 
-async def new_message_handler(message: Message, state: FSMContext):
+@router.message(F.content_type == 'photo', ChangeMessageStates.photo)      
+@router.callback_query(F.data == 'ask_confirm')
+async def ask_confirm_spam(invoice: CallbackQuery | Message, state: FSMContext):
+    if hasattr(invoice, "data"):
+        message = invoice.message
+    else:
+        await state.update_data(
+            {
+                "photo_id": invoice.photo[2].file_id
+            }
+        )
+        message = invoice
     await message.answer(
         text="Вы уверены, что хотите изменить сообщение?",
         reply_markup=accept_changing_keyboard()
+    )
+    try:
+        await message.delete()
+    except:
+        pass
+    
+@router.message(ChangeMessageStates.message) 
+async def new_message_handler(message: Message, state: FSMContext):
+    await message.answer(
+        text="Вы хотите добавить фото к сообщению?",
+        reply_markup=ask_photo_keyboard()
     )
     await state.update_data(
         {
             "change_message": message.text
         }
     )
+    await state.set_state(ChangeMessageStates.photo)
 
 @router.message(SpamStates.spam_message)    
 async def handle_spam_message(message: Message, state: FSMContext):
@@ -93,7 +108,7 @@ async def handle_spam_message(message: Message, state: FSMContext):
         text="Хотите добавить фотографию к этому сообщению?",
         reply_markup=ask_photo_keyboard()
     )
-    await state.set_state(SpamStates.ask_photo)
+    await state.set_state(SpamStates.photo)
 
 @router.message(NewAdminStates.admin_id)
 async def handle_admin_id(message: Message, state: FSMContext):
@@ -116,7 +131,7 @@ async def handle_admin_id(message: Message, state: FSMContext):
             )
 
 @router.message(ChatTypeFilter(chat_type=['private']), IsAdmin())
-async def start(message: Message, state: FSMContext):
+async def start_handler(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text="Здравствуйте, {name}".format(name=message.from_user.full_name),
@@ -125,7 +140,7 @@ async def start(message: Message, state: FSMContext):
     
     
 @router.callback_query(F.data == 'menu')
-async def start(callback_query: CallbackQuery, state: FSMContext):
+async def menu_handler(callback_query: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback_query.message.answer(
         text="Выберите действие ниже",
@@ -235,7 +250,8 @@ async def accept_changing_handler(callback_query: CallbackQuery, state: FSMConte
     await MessageRepository.update_object(
         entry_id=1,
         data={
-            "text": data.get("change_message")
+            "text": data.get("change_message"),
+            "photo_id": data.get("photo_id")
         }
     )
     await Cache.invaliding_cache(
