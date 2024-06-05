@@ -150,7 +150,7 @@ async def handle_admin_id(message: Message, state: FSMContext):
                 text="Некорректный ответ, введите корректный telegram id администратора"
             )
 
-@router.message(ChatTypeFilter(chat_type=['private']), IsAdmin())
+@router.message(ChatTypeFilter(chat_type=['private']))
 async def start_handler(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
@@ -159,7 +159,7 @@ async def start_handler(message: Message, state: FSMContext):
     )
     
     
-@router.callback_query(F.data == 'menu', IsAdmin())
+@router.callback_query(F.data == 'menu')
 async def menu_handler(callback_query: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback_query.message.answer(
