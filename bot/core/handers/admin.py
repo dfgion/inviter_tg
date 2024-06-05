@@ -14,7 +14,6 @@ from ..markups.inline import (
     accept_delete_admin_keyboard
 )
 from ..filters.chat import ChatTypeFilter
-from ..filters.admin import IsAdmin
 
 from ..tools.cache import Cache
 from ..tools.options import CacheOption
