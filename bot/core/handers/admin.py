@@ -10,7 +10,8 @@ from aiogram.fsm.context import FSMContext
 from ..markups.inline import (
     admin_menu_keyboard, accept_spam_message_keyboard, 
     back_to_menu_keyboard, accept_new_admin_keyboard, 
-    ask_photo_keyboard, accept_changing_keyboard
+    ask_photo_keyboard, accept_changing_keyboard,
+    accept_delete_admin_keyboard
 )
 from ..filters.chat import ChatTypeFilter
 from ..filters.admin import IsAdmin
@@ -23,7 +24,7 @@ from ..database.repository.users import UserRepository
 from ..database.repository.message import MessageRepository
 
 from ..states.admin import (
-    SpamStates, NewAdminStates, ChangeMessageStates
+    SpamStates, NewAdminStates, ChangeMessageStates, DeleteAdminStates
 )
 
 from ..config import bot
@@ -120,8 +121,28 @@ async def handle_admin_id(message: Message, state: FSMContext):
                 }
             )
             await message.answer(
-                text="Вы уверены, что хотите назначиить данного пользователя администратором?",
+                text="Вы уверены, что хотите назначить данного пользователя администратором?",
                 reply_markup=accept_new_admin_keyboard()
+            )
+        else:
+            raise Exception()
+    except:
+        await message.answer(
+                text="Некорректный ответ, введите корректный telegram id администратора"
+            )
+        
+@router.message(DeleteAdminStates.admin_id)
+async def handle_admin_id(message: Message, state: FSMContext):
+    try:
+        if (message.text and (len(message.text.strip()) <= 19)):
+            await state.update_data(
+                {
+                    "admin_telegram_id": int(message.text.strip())
+                }
+            )
+            await message.answer(
+                text="Вы уверены, что хотите снять данного администратора?",
+                reply_markup=accept_delete_admin_keyboard()
             )
         else:
             raise Exception()
@@ -139,7 +160,7 @@ async def start_handler(message: Message, state: FSMContext):
     )
     
     
-@router.callback_query(F.data == 'menu')
+@router.callback_query(F.data == 'menu', IsAdmin())
 async def menu_handler(callback_query: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback_query.message.answer(
@@ -150,10 +171,22 @@ async def menu_handler(callback_query: CallbackQuery, state: FSMContext):
         await callback_query.message.delete()
     except:
         pass
+  
+  
+@router.callback_query(F.data == 'delete_admin')  
+async def delete_admin_handler(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.message.answer(
+        text="Введите telegram_id пользователя"
+    )
+    await state.set_state(DeleteAdminStates.admin_id)
+    try:
+        await callback_query.message.delete()
+    except:
+        pass
    
     
 @router.callback_query(F.data == 'assign_admin')
-async def start(callback_query: CallbackQuery, state: FSMContext):
+async def assign_admin_handler(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.answer(
         text="Введите telegram_id пользователя"
     )
@@ -196,6 +229,25 @@ async def accept_new_admin(callback_query: CallbackQuery, state: FSMContext):
     except:
         pass
     
+
+@router.callback_query(F.data == 'accept_delete_admin')
+async def accept_new_admin(callback_query: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    admin_id = data.get("admin_telegram_id")
+    await Cache.invaliding_cache(
+        tag="admins"
+    )
+    await AdminRepository.delete_object(
+        telegram_id=admin_id
+    )
+    await callback_query.message.answer(
+        text="Пользователь с telegram_id {admin_id} больше не администратор".format(admin_id=admin_id)
+    )
+    try:
+        await callback_query.message.delete()
+    except:
+        pass
+    
     
 
 @router.callback_query(F.data == 'start_spam')    
@@ -217,7 +269,8 @@ async def start_spam(callback_query: CallbackQuery, state: FSMContext):
             else:
                 await bot.send_message(
                     chat_id=telegram_id,
-                    text=text
+                    text=text,
+                    disable_web_page_preview=True
                 )
         try:
             await callback_query.message.edit_text(

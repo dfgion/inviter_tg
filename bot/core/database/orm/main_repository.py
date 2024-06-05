@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 
 from .base import AbstractRepository
 
@@ -47,5 +47,21 @@ class SqlAlchemyRepository(AbstractRepository):
             )
             await session.execute(stmt)
             await session.commit()   
+
+class SqlAlchemyAdminRepository(SqlAlchemyRepository):
+    
+    @classmethod
+    async def delete_object(
+        cls,
+        telegram_id: str
+    ):
+        stmt = (
+            delete(cls.model)
+            .where(cls.model.telegram_id == telegram_id)
+        )
+        
+        async with async_session() as session:
+            await session.execute(stmt)
+            await session.commit()
             
             

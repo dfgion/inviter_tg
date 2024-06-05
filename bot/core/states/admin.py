@@ -7,6 +7,10 @@ class SpamStates(StatesGroup):
 class NewAdminStates(StatesGroup):
     admin_id = State()
     
+    
+class DeleteAdminStates(StatesGroup):
+    admin_id = State()
+    
 class ChangeMessageStates(StatesGroup):
     message = State()
     line = State()

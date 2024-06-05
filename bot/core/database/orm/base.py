@@ -13,3 +13,7 @@ class AbstractRepository(ABC):
     @abstractmethod
     async def update_object():
         raise NotImplementedError
+    
+    @abstractmethod
+    async def delete_object():
+        raise NotImplementedError

@@ -12,7 +12,6 @@ def on_startup(dispatcher):
     
 def set_middleware_router(router: Router):
     router.chat_join_request.middleware.register(NewUserMiddleware())
-    router.chat_member.middleware.register(NewUserMiddleware())
     return router
 
 def dp_setting(dp: Dispatcher) -> None:

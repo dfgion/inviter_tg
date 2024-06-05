@@ -1,5 +1,5 @@
-from ..orm.main_repository import SqlAlchemyRepository
+from ..orm.main_repository import SqlAlchemyAdminRepository
 from ..models.admin import AdminOrm
 
-class AdminRepository(SqlAlchemyRepository):
+class AdminRepository(SqlAlchemyAdminRepository):
     model = AdminOrm

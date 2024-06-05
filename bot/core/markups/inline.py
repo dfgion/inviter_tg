@@ -8,6 +8,7 @@ def admin_menu_keyboard():
         {"text": "Назначить администратора", "callback_data": "assign_admin"},
         {"text": "Рассылка", "callback_data": "spam"},
         {"text": "Изменить первое сообщение", "callback_data": "change_join_message"},
+        {"text": "Удалить администратора", "callback_data": "delete_admin"},
     ]
     
     for button in buttons:
@@ -57,6 +58,22 @@ def accept_new_admin_keyboard():
     buttons = [
         {"text": "Да, назначить", "callback_data": "accept_new_admin"},
         {"text": "Нет, не назначать", "callback_data": "menu"}
+    ]
+    
+    
+    for button in buttons:
+        inline_keyboard.add(InlineKeyboardButton(**button))
+        
+    inline_keyboard.adjust(1, 1)
+    
+    return inline_keyboard.as_markup()
+
+def accept_delete_admin_keyboard():
+    inline_keyboard = InlineKeyboardBuilder()
+    
+    buttons = [
+        {"text": "Да, снять", "callback_data": "accept_delete_admin"},
+        {"text": "Нет, оставить", "callback_data": "menu"}
     ]
     
     

@@ -27,29 +27,14 @@ async def approve_user(chat_join: ChatJoinRequest, bot: Bot):
                 chat_id=chat_join.from_user.id,
                 photo=photo_id,
                 caption=messages[0]['text'],
-                parse_mode='html'
+                parse_mode='html',
             )
         else: 
             await bot.send_message(
                 chat_id=chat_join.from_user.id,
                 text=messages[0]['text'],
-                parse_mode='html'
+                parse_mode='html',
+                disable_web_page_preview=True
             )
-    except:
-        pass
-
-@router.chat_member(ChatMemberUpdatedFilter(JOIN_TRANSITION))
-async def handle_public_join(event: ChatMemberUpdated, bot: Bot):
-    messages = await Cache.router(
-        func=MessageRepository.get_objects,
-        by=CacheOption.GET,
-        tag='messages'
-    )
-    try:
-        await bot.send_message(
-            chat_id=event.from_user.id,
-            text=messages[0],
-            parse_mode='html'
-        )
     except:
         pass
