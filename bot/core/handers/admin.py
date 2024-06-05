@@ -241,7 +241,7 @@ async def accept_new_admin(callback_query: CallbackQuery, state: FSMContext):
         telegram_id=admin_id
     )
     await callback_query.message.answer(
-        text="Пользователь с telegram_id {admin_id} больше не администратор".format(admin_id=admin_id)
+        text="Пользователь с telegram_id {admin_id} больше не является администратором".format(admin_id=admin_id)
     )
     try:
         await callback_query.message.delete()

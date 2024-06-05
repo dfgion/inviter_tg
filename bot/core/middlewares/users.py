@@ -15,7 +15,6 @@ class NewUserMiddleware(BaseMiddleware):
         event: Union[ChatMemberUpdated, ChatJoinRequest], 
         data: Dict[str, Any]
     ) -> Coroutine[Any, Any, Any]:
-        print("In NewUser")
         await Cache.invaliding_cache(
             tag="users"
         )
